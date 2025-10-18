@@ -23,6 +23,9 @@ def get_weather(lat, lon):
         "temp": data["main"]["temp"],
         "humidity": data["main"]["humidity"],
         "wind_speed": data["wind"]["speed"],
+        "wind_gusts": data["wind"].get("gust", 0.0),
+        "clouds": data["clouds"]["all"],
+        "visibility": data["visibility"],
         "description": data["weather"][0]["description"]
     }
     return weather_info
@@ -62,11 +65,27 @@ def get_grid(start_lat, start_lon, end_lat, end_lon):
 
     # Fetch weather data for each point on the grid
     temps = []
+    humiditys = []
+    wind_speeds = []
+    wind_gusts = []
+    clouds = []
+    visibilitys = []
+
     for lat, lon in zip(lats.ravel(), lons.ravel()):
-        temp = get_weather_data(lat, lon)
-        temps.append(temp if temp is not None else np.nan)
+        weather = get_weather(lat, lon)
+        temps.append(weather["temp"] if weather["temp"] is not None else np.nan)
+        humiditys.append(weather["humidity"] if weather["humidity"] is not None else np.nan)
+        wind_speeds.append(weather["wind_speed"] if weather["wind_speed"] is not None else np.nan)
+        wind_gusts.append(weather["wind_gusts"] if weather["wind_gusts"] is not None else np.nan)
+        clouds.append(weather["clouds"] if weather["clouds"] is not None else np.nan)
+        visibilitys.append(weather["visibility"] if weather["visibility"] is not None else np.nan)
 
     temps = np.array(temps).reshape(lats.shape)
+    humiditys = np.array(humiditys).reshape(lats.shape)
+    wind_speeds = np.array(wind_speeds).reshape(lats.shape)
+    wind_gusts = np.array(wind_gusts).reshape(lats.shape)
+    clouds = np.array(clouds).reshape(lats.shape)
+    visibilitys = np.array(visibilitys).reshape(lats.shape)
 
     # Plotting the temperature data
     # plt.figure(figsize=(8, 6))
@@ -77,4 +96,4 @@ def get_grid(start_lat, start_lon, end_lat, end_lon):
     # plt.ylabel('Latitude')
     # plt.show()
 
-    return temps, lats, lons
+    return temps, humiditys, wind_speeds, wind_gusts, clouds, visibilitys, lats, lons

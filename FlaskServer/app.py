@@ -6,6 +6,7 @@ from risk_model import calculate_risk
 from sentinelhub_utils import fetch_sentinel2_image, img_to_base64
 from route_calculations import shortest_route
 from flask_cors import CORS
+from geopy.distance import geodesic
 
 app = Flask(__name__)
 CORS(app)
@@ -22,17 +23,14 @@ def get_route():
     end_lat = data.get('end_lat')
     end_lon = data.get('end_lon')
 
-    route = shortest_route(start_lat, start_lon, end_lat, end_lon)
+    distance = geodesic((start_lat, start_lon), (end_lat, end_lon)).km
+    if distance < 1.2:
+        return jsonify({"error": "Distance too small"}), 400
 
-    print(str(start_lat) + " =? " + str(route[0][0]))
-    print(str(start_lon) + " =? " + str(route[0][1]))
-
-    print(str(end_lat) + " =? " + str(route[-1][0]))
-    print(str(end_lon) + " =? " + str(route[-1][1]))
+    route, average, tags = shortest_route(start_lat, start_lon, end_lat, end_lon)
 
     print("Route sent!")
-    return jsonify({'route': route})
-
+    return jsonify({'route': route, 'averages': average, 'recommendation': "No Go" if average['risk_score']<0.5 else "Go", 'tags' : tags}), 200
 
 @app.route("/risk_score", methods=["GET"])
 def risk_score():
