@@ -1,0 +1,14 @@
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
+body {
+  margin: 0;
+  font-family: monospace;
+  background-color: #111;
+  color: #fff;
+}
+
+.leaflet-container {
+  height: 500px;
+  width: 100%;
+  border-radius: 12px;
+}
