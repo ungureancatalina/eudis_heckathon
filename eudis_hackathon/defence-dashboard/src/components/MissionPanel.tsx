@@ -4,6 +4,10 @@ interface WeatherData {
     temperature: string;
     humidity: string;
     windSpeed: string;
+    clouds?: number;
+    visibility?: number;
+    windGust?: number;
+    ndvi?: number;
 }
 
 interface RouteData {
@@ -11,6 +15,8 @@ interface RouteData {
     score: number;
     recommendation: 'Go' | 'No Go';
     weather: WeatherData;
+    points?: { lat: number; lon: number }[];
+    tags?: string[];
 }
 
 interface MissionPanelProps {
@@ -27,6 +33,7 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ routes }) => (
         borderRadius: '20px',
         padding: '40px',
         display: 'flex',
+        minHeight: '640px',
         flexDirection: 'column',
         gap: '40px',
         border: '2px solid #50c0e9',
@@ -75,22 +82,12 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ routes }) => (
                          target.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
                      }}>
 
-                    <h3 style={{
-                        color: '#FFFFFF',
-                        fontSize: '40px',
-                        marginBottom: '24px',
-                        fontWeight: 'bold',
-                        textAlign: 'center'
-                    }}>
-                        {route.name}
-                    </h3>
-
                     <div style={{
                         display: 'flex',
-                        justifyContent: 'center',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        gap: '16px',
-                        marginBottom: '20px'
+                        marginBottom: '24px',
+                        gap: '20px'
                     }}>
                         <svg width="80" height="80">
                             <circle cx="40" cy="40" r="32" fill="none" stroke="#444" strokeWidth="8" />
@@ -118,41 +115,96 @@ const MissionPanel: React.FC<MissionPanelProps> = ({ routes }) => (
                             </text>
                         </svg>
 
-                        <p style={{
-                            fontSize: '34px',
+                        <h3 style={{
+                            color: '#FFFFFF',
+                            fontSize: '50px',
                             fontWeight: 'bold',
-                            color: route.recommendation === 'Go' ? '#00FF00' : '#FF4500'
+                            margin: 0
+                        }}>
+                            {route.name}
+                        </h3>
+
+                        <p style={{
+                            fontSize: '40px',
+                            fontWeight: 'bold',
+                            justifyContent: 'right',
+                            color: route.recommendation === 'Go' ? '#00FF00' : '#FF4500',
+                            margin: 0,
                         }}>
                             {route.recommendation}
                         </p>
                     </div>
 
-                    <table style={{
-                        width: '100%',
-                        borderCollapse: 'collapse',
-                        textAlign: 'center',
-                        fontSize: '22px',
-                        color: '#FFFFFF',
+
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '16px',
+                        marginBottom: '20px'
                     }}>
-                        <thead>
-                        <tr>
-                            <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>🌡 Temperature</th>
-                            <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>💧 Humidity</th>
-                            <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>🌬 Wind Speed</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style={{ padding: '12px', color: '#FF6347', fontWeight: 'bold' }}>{route.weather.temperature}</td>
-                            <td style={{ padding: '12px', color: '#00BFFF', fontWeight: 'bold' }}>{route.weather.humidity}</td>
-                            <td style={{ padding: '12px', color: '#7CFC00', fontWeight: 'bold' }}>{route.weather.windSpeed}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+
+
+                        <table style={{
+                            width: '60%',
+                            borderCollapse: 'collapse',
+                            textAlign: 'center',
+                            fontSize: '22px',
+                            color: '#FFFFFF',
+                            marginBottom: '20px',
+                            marginLeft: '20px'
+                        }}>
+                            <thead>
+                            <tr>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>Temp</th>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>Humidity</th>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>Wind</th>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>Clouds</th>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>Visibility</th>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>Wind Gust</th>
+                                <th style={{ borderBottom: '2px solid #50c0e9', padding: '10px' }}>NDVI</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td style={{ padding: '12px', fontWeight: 'bold', color: '#FF6347' }}>{route.weather.temperature}</td>
+                                <td style={{ padding: '12px', fontWeight: 'bold', color: '#00BFFF' }}>{route.weather.humidity}</td>
+                                <td style={{ padding: '12px', fontWeight: 'bold', color: '#7CFC00' }}>{route.weather.windSpeed}</td>
+                                <td style={{ padding: '12px', color: '#FFD700', fontWeight: 'bold' }}>{route.weather.clouds}</td>
+                                <td style={{ padding: '12px', color: '#FF69B4', fontWeight: 'bold' }}>{route.weather.visibility}</td>
+                                <td style={{ padding: '12px', color: '#ADFF2F', fontWeight: 'bold' }}>{route.weather.windGust}</td>
+                                <td style={{ padding: '12px', color: '#32CD32', fontWeight: 'bold' }}>{route.weather.ndvi}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {route.tags && route.tags.length > 0 && (
+                        <div style={{
+                            marginTop: '16px',
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '12px',
+                            justifyContent: 'center'
+                        }}>
+                            {route.tags.map((tag, i) => (
+                                <span key={i} style={{
+                                    backgroundColor: '#50c0e9',
+                                    color: '#1a1a2f',
+                                    fontWeight: 'bold',
+                                    padding: '6px 14px',
+                                    borderRadius: '12px',
+                                    fontSize: '20px',
+                                    textAlign: 'center'
+                                }}>
+                            {tag}
+                        </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
-            )
+            );
         })}
     </div>
 );
-
 export default MissionPanel;

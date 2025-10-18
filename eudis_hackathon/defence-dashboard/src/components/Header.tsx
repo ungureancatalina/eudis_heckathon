@@ -18,7 +18,7 @@ const Header: React.FC = () => (
             fontWeight: 'bold',
             textShadow: '0 0 8px #0097fc',
         }}>
-            AeroMind - Defence Dashboard
+            AeroMind - Dashboard
         </h1>
     </header>
 );

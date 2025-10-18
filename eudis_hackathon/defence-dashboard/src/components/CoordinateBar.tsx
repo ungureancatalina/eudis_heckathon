@@ -26,7 +26,6 @@ const CoordinateBar: React.FC<CoordinateBarProps> = ({
         backgroundColor: '#1e1e2f',
         color: '#fff',
     };
-
     const labelStyle = { fontSize: '28px', fontWeight: 'bold' };
 
     const handleClear = () => {
@@ -45,21 +44,19 @@ const CoordinateBar: React.FC<CoordinateBarProps> = ({
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                padding: '14px',
-                backgroundImage: 'url("/image.jpg")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'top',
-                borderRadius: '8px',
-                border: '2px solid #50c0e9',
-                color: '#fff',
-                marginBottom: '8px',
-            }}
-        >
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            padding: '14px',
+            backgroundImage: 'url("/image.jpg")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'top',
+            borderRadius: '8px',
+            border: '2px solid #50c0e9',
+            color: '#fff',
+            marginBottom: '8px',
+        }}>
             <div style={{marginLeft: '20px'}}>
                 <label style={labelStyle}>Start Latitude:</label>
                 <input
@@ -118,15 +115,17 @@ const CoordinateBar: React.FC<CoordinateBarProps> = ({
                     cursor: 'pointer',
                     marginLeft: "40px",
                 }}
-                onMouseEnter={(e) => {
+                onMouseOver={(e) => {
                     const target = e.currentTarget;
-                    target.style.backgroundColor = '#00bfff';
-                    target.style.color = '#1a1a2f';
+                    target.style.transform = 'scale(1.1)';
+                    target.style.backgroundColor = '#113d93';
+                    target.style.boxShadow = '0 12px 24px rgba(0,151,252,0.5)';
                 }}
                 onMouseLeave={(e) => {
                     const target = e.currentTarget;
+                    target.style.transform = 'scale(1)';
                     target.style.backgroundColor = '#1a1a2f';
-                    target.style.color = '#fff';
+                    target.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
                 }}
             >
                 Clear
@@ -144,15 +143,17 @@ const CoordinateBar: React.FC<CoordinateBarProps> = ({
                     borderRadius: '8px',
                     cursor: 'pointer',
                 }}
-                onMouseEnter={(e) => {
+                onMouseOver={(e) => {
                     const target = e.currentTarget;
-                    target.style.backgroundColor = '#00bfff';
-                    target.style.color = '#1a1a2f';
+                    target.style.transform = 'scale(1.1)';
+                    target.style.backgroundColor = '#113d93';
+                    target.style.boxShadow = '0 12px 24px rgba(0,151,252,0.5)';
                 }}
                 onMouseLeave={(e) => {
                     const target = e.currentTarget;
+                    target.style.transform = 'scale(1)';
                     target.style.backgroundColor = '#1a1a2f';
-                    target.style.color = '#fff';
+                    target.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
                 }}
             >
                 Send
