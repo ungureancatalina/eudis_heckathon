@@ -22,3 +22,52 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.log
+
+# --- Virtual environments ---
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Flask / instance folder ---
+instance/
+*.db
+*.sqlite3
+*.sqlite
+
+# --- Environment / secrets ---
+.env
+.env.*
+*.env
+config.py
+secrets.json
+
+# --- IDE / editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- Build / packaging ---
+build/
+dist/
+*.egg-info/
+.eggs/
+FlaskServer/.env
+FlaskServer/.env
+FlaskServer/.env
