@@ -56,6 +56,24 @@ const Dashboard: React.FC = () => {
     const [overlayMessage, setOverlayMessage] = useState<string | null>(null);
     const [updatingMission, setUpdatingMission] = useState(false);
 
+    const militaryBases = [
+        { name: "Câmpia Turzii Air Base (71st Air Base)", lat: 46.516, lon: 23.883 },
+        { name: "Mihail Kogălniceanu Air Base", lat: 44.353, lon: 28.488 },
+        { name: "Fetești Air Base (86th Air Base)", lat: 44.385, lon: 27.742 },
+        { name: "Deveselu Aegis Ballistic Missile Defense Base", lat: 44.074, lon: 24.374 },
+        { name: "Boboc Air Base (95th Air Base)", lat: 45.149, lon: 26.967 },
+        { name: "Cincu Military Training Area", lat: 45.855, lon: 24.976 },
+        { name: "Smârdan Training Range", lat: 45.553, lon: 27.907 },
+        { name: "Borcea Airfield", lat: 44.35, lon: 27.733 },
+        { name: "Timișoara Giarmata Airfield", lat: 45.809, lon: 21.337 },
+        { name: "Otopeni (90th Airlift Base)", lat: 44.572, lon: 26.085 },
+        { name: "Kecskemét Air Base, Hungary", lat: 46.896, lon: 19.702 },
+        { name: "Szolnok Air Base, Hungary", lat: 47.194, lon: 20.180 },
+        { name: "Aviano Air Base, Italy", lat: 46.010, lon: 12.632 },
+        { name: "Grafenwöhr Training Area, Germany", lat: 49.685, lon: 11.755 },
+        { name: "Chaţeneau Air Base (?), Moldova", lat: 47.055, lon: 28.863 },
+    ];
+
     const handleSendCoords = (coords: Coordinates) => {
         setPendingCoords(coords);
         setDroneNameInput('');
@@ -196,6 +214,7 @@ const Dashboard: React.FC = () => {
                         setEndPoint={setEndPoint}
                         routes={visibleRoutes}
                         loading={loadingRoute}
+                        militaryBases={militaryBases}
                     />
                 </div>
 

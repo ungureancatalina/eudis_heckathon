@@ -15,6 +15,7 @@ interface MapViewProps {
     routes?: Record<string, RoutePoint[]>;
     loading?: boolean;
     animatedDroneId?: string;
+    militaryBases?: { name: string; lat: number; lon: number }[];
 }
 
 const lineColors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta'];
@@ -44,6 +45,14 @@ const endIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/leaflet-shadow.png',
     shadowSize: [41, 41],
+});
+
+
+const baseIcon = new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854878.png\n',
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -35],
 });
 
 const AnimatedSegments: React.FC<{ points: RoutePoint[], color: string }> = ({ points, color }) => {
@@ -96,8 +105,35 @@ const MapClickHandler: React.FC<{
     return null;
 };
 
+const baseStocks: Record<string, { total: number; types: { name: string; count: number }[] }> = {
+    "Câmpia Turzii Air Base (71st Air Base)": {
+        total: 18,
+        types: [
+            { name: "Recon", count: 8 },
+            { name: "Strike", count: 6 },
+            { name: "Logistics", count: 4 },
+        ]
+    },
+    "Mihail Kogălniceanu Air Base": {
+        total: 21,
+        types: [
+            { name: "Recon", count: 10 },
+            { name: "CAS", count: 7 },
+            { name: "Transport", count: 4 },
+        ]
+    },
+    "DEFAULT": {
+        total: 12,
+        types: [
+            { name: "Recon", count: 5 },
+            { name: "Strike", count: 4 },
+            { name: "Support", count: 3 },
+        ]
+    }
+};
 
-const MapView: React.FC<MapViewProps> = ({ startPoint, endPoint, setStartPoint, setEndPoint, routes, loading, animatedDroneId }) => {
+
+const MapView: React.FC<MapViewProps> = ({ startPoint, endPoint, setStartPoint, setEndPoint, routes, loading, animatedDroneId, militaryBases  }) => {
     return (
         <div style={{ flex: 2, borderRadius: '12px', border: '2px solid #50c0e9', overflow: 'hidden', position: 'relative' }}>
             <MapContainer
@@ -126,6 +162,28 @@ const MapView: React.FC<MapViewProps> = ({ startPoint, endPoint, setStartPoint, 
                 {startPoint && <Marker position={[startPoint.lat, startPoint.lon]} icon={tempIcon}><Popup>Start Temp</Popup></Marker>}
                 {endPoint && <Marker position={[endPoint.lat, endPoint.lon]} icon={tempIcon}><Popup>End Temp</Popup></Marker>}
 
+                {militaryBases && militaryBases.map((base, i) => {
+                    const stock = baseStocks[base.name] ?? baseStocks["DEFAULT"];
+                    return (
+                        <Marker key={'base-' + i} position={[base.lat, base.lon]} icon={baseIcon}>
+                            <Popup>
+                                <div style={{ minWidth: 220, fontFamily: 'monospace', lineHeight: 1.2 }}>
+                                    <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 6 }}>{base.name}</div>
+                                    <div style={{ fontWeight: 600 , fontSize: 20}}>Total drone: {stock.total}</div>
+                                    <div style={{ marginTop: 6 , fontSize: 20}}>
+                                        {stock.types.map((t, idx) => (
+                                            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>{t.name}</span>
+                                                <span style={{ fontWeight: 700 }}>{t.count}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    );
+                })}
+
                 {routes && Object.entries(routes).map(([droneId, points], idx) => {
                     const color = lineColors[idx % lineColors.length];
                     return (
@@ -145,10 +203,18 @@ const MapView: React.FC<MapViewProps> = ({ startPoint, endPoint, setStartPoint, 
                             {points.length > 0 && (
                                 <>
                                     <Marker position={[points[0].lat, points[0].lon]} icon={startIcon}>
-                                        <Popup>{droneId} Start</Popup>
+                                        <Popup>
+                                            <div style={{ fontWeight: 600, fontSize: 20 }}>
+                                                {droneId} Start
+                                            </div>
+                                        </Popup>
                                     </Marker>
                                     <Marker position={[points[points.length - 1].lat, points[points.length - 1].lon]} icon={endIcon}>
-                                        <Popup>{droneId} End</Popup>
+                                        <Popup>
+                                            <div style={{ fontWeight: 600, fontSize: 20 }}>
+                                                {droneId} End
+                                            </div>
+                                        </Popup>
                                     </Marker>
                                 </>
                             )}
@@ -189,6 +255,14 @@ const MapView: React.FC<MapViewProps> = ({ startPoint, endPoint, setStartPoint, 
                 <div style={{ display: 'flex', alignItems: 'center', marginTop: '4px' }}>
                     <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" alt="end" style={{ width: '25px', marginRight: '6px' }} />
                     <span style={{ fontSize: '25px', }}>End</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+                    <img
+                        src="https://cdn-icons-png.flaticon.com/512/854/854878.png"
+                        alt="military base"
+                        style={{ width: '25px', marginRight: '6px' }}
+                    />
+                    <span style={{ fontSize: '25px' }}>Military Base</span>
                 </div>
             </div>
 
