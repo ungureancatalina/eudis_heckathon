@@ -2,14 +2,10 @@ import requests
 import os
 from dotenv import load_dotenv
 import numpy as np
-import matplotlib.pyplot as plt
-from geopy.distance import geodesic
-
+from real_world_to_softweare_utils import generate_grid
 
 load_dotenv()
-
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-
 
 def get_weather(lat, lon):
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric"
@@ -29,35 +25,6 @@ def get_weather(lat, lon):
         "description": data["weather"][0]["description"]
     }
     return weather_info
-
-
-def get_weather_data(lat, lon):
-    params = {
-        'lat': lat,
-        'lon': lon,
-        'appid': OPENWEATHER_API_KEY,
-        'units': 'metric'  # Temperature in Celsius
-    }
-    API_URL = 'https://api.openweathermap.org/data/2.5/weather'
-
-    response = requests.get(API_URL, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        return data['main']['temp']  # Return temperature
-    else:
-        print(f"Error fetching data for {lat}, {lon}")
-        return None
-
-# Function to generate a grid of coordinates
-def generate_grid(start_lat, start_lon, end_lat, end_lon, spacing_km=1):
-    # Calculate the number of steps in each direction
-    distance = geodesic((start_lat, start_lon), (end_lat, end_lon)).km
-    num_steps = int(distance // spacing_km)
-
-    # Generate grid of coordinates
-    lats = np.linspace(start_lat, end_lat, num_steps)
-    lons = np.linspace(start_lon, end_lon, num_steps)
-    return np.array(np.meshgrid(lats, lons))
 
 def get_grid(start_lat, start_lon, end_lat, end_lon):
     # Generate the grid
@@ -86,14 +53,5 @@ def get_grid(start_lat, start_lon, end_lat, end_lon):
     wind_gusts = np.array(wind_gusts).reshape(lats.shape)
     clouds = np.array(clouds).reshape(lats.shape)
     visibilitys = np.array(visibilitys).reshape(lats.shape)
-
-    # Plotting the temperature data
-    # plt.figure(figsize=(8, 6))
-    # plt.contourf(lons, lats, temps, cmap='coolwarm')
-    # plt.colorbar(label='Temperature (°C)')
-    # plt.title('Temperature Map')
-    # plt.xlabel('Longitude')
-    # plt.ylabel('Latitude')
-    # plt.show()
 
     return temps, humiditys, wind_speeds, wind_gusts, clouds, visibilitys, lats, lons

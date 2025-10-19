@@ -1,61 +1,70 @@
-from sentinelhub import SHConfig, BBox, CRS, SentinelHubRequest, DataCollection, MimeType
+import os
+from sentinelhub import SHConfig, BBox, CRS, SentinelHubRequest, MimeType, DataCollection
 import numpy as np
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
+from dotenv import load_dotenv
+from real_world_to_softweare_utils import generate_grid
 
-# Configure Sentinel Hub credentials
+load_dotenv()
 config = SHConfig()
-#config.instance_id = '5e1ff9bc-4b83-41dd-89dc-f3f2b46289ed'
-config.sh_client_id = '5e1ff9bc-4b83-41dd-89dc-f3f2b46289ed'
-config.sh_client_secret = 'UBPEd5DWFwBeqha9CHHO8TQNrMY3M0oy'
 
-def fetch_sentinel2_image(lat, lon, size=512, save_path=None):
+config.sh_client_id = os.getenv("SENTINEL_CLIENT_ID")
+config.sh_client_secret = os.getenv("SENTINEL_CLIENT_SECRET")
+
+def get_ndvi(lon, lat, date_range=('2025-01-01', '2025-01-10'), pixel_size=1):
     """
-    Fetches a true-color Sentinel-2 image (L2A) for a given lat/lon.
-    Returns a numpy array (H,W,3) normalized for display.
+    Returns NDVI and vegetation category at a given coordinate.
+
+    Parameters:
+        lon, lat: float - coordinate in WGS84
+        date_range: tuple - start and end dates ('YYYY-MM-DD')
+        pixel_size: int - pixel size for area averaging (default 1x1 pixel)
+    Returns:
+        dict: { 'ndvi': float, 'category': str }
     """
-    # Wider bounding box (~2 km)
-    bbox = BBox(bbox=[lon-0.1, lat-0.1, lon+0.1, lat+0.1], crs=CRS.WGS84)
+
+    bbox = BBox(bbox=(lon - 0.0005, lat - 0.0005, lon + 0.0005, lat + 0.0005), crs=CRS.WGS84)
 
     request = SentinelHubRequest(
         evalscript="""
         //VERSION=3
         function setup() {
-            return { input: ["B04", "B03", "B02"], output: { bands: 3 } };
+          return {
+            input: ["B04", "B08"],
+            output: { bands: 1, sampleType: "FLOAT32" }  // <-- important!
+          };
         }
+        
         function evaluatePixel(sample) {
-            return [sample.B04, sample.B03, sample.B02];
+          let nir = sample.B08 / 10000.0;
+          let red = sample.B04 / 10000.0;
+          let ndvi = (nir - red) / (nir + red + 1e-6);
+          return [ndvi];
         }
         """,
         input_data=[SentinelHubRequest.input_data(
-            DataCollection.SENTINEL2_L2A,
-            time_interval=('2025-01-01', '2025-10-01')  # Recent date interval
+            data_collection=DataCollection.SENTINEL2_L2A,
+            time_interval=date_range,
+            mosaicking_order='leastCC'
         )],
         responses=[SentinelHubRequest.output_response('default', MimeType.TIFF)],
         bbox=bbox,
-        size=(size, size),
+        size=(pixel_size, pixel_size),
         config=config
     )
 
     data = request.get_data()
-    if len(data) == 0:
-        print("No image returned, try different location/date")
-        return None
+    ndvi_array = np.array(data[0])
 
-    img = np.array(data[0], dtype=np.float32)
+    ndvi_value = float(np.mean(ndvi_array))
 
-    # Normalize to 0-1 for display
-    img = img / 3000.0
-    img = np.clip(img, 0, 1)
+    return round(ndvi_value, 3)
 
-    if save_path:
-        plt.imsave(save_path, img)
+def get_ndvi_grid(start_lat, start_lon, end_lat, end_lon):
+    ndvis = []
+    lats, lons = generate_grid(start_lat, start_lon, end_lat, end_lon)
 
-    return img
+    for lat, lon in zip(lats.ravel(), lons.ravel()):
+        ndvi = get_ndvi(lon, lat)
+        ndvis.append(ndvi if ndvi is not None else np.nan)
 
-def img_to_base64(img_array):
-    buf = BytesIO()
-    plt.imsave(buf, img_array, format='png')
-    buf.seek(0)
-    return base64.b64encode(buf.read()).decode('utf-8')
+    return np.array(ndvis).reshape(lats.shape)

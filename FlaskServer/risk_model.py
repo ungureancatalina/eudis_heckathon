@@ -1,24 +1,27 @@
-def calculate_risk(weather):
+import joblib
+import numpy as np
+
+# Load AI model (trained in risk_model_ai.py)
+model = joblib.load("risk_model_ai.pkl")
+
+def calculate_risk(data):
     """
-    Very simple rule-based risk calculation.
+    Expects weather_data dict with:
+    temp, humidity, wind_speed, wind_gust, clouds, visibility, ndvi
     """
-    score = 0.0
 
-    # Weather impact
-    if "temp" in weather:
-        if weather["temp"] < 0 or weather["temp"] > 35:
-            score += 0.2
-    if "wind_speed" in weather:
-        if weather["wind_speed"] > 15:  # m/s
-            score += 0.3
-    if "description" in weather:
-        if "rain" in weather["description"] or "storm" in weather["description"]:
-            score += 0.3
+    features = np.array([
+        data['temp'],
+        data['humidity'],
+        data['wind_speed'],
+        data['wind_gust'],
+        data['clouds'],
+        data['visibility'],
+        data['ndvi']
+    ]).reshape(1, -1)
 
-    # Normalize score to 0-1
-    if score > 1.0:
-        score = 1.0
+    pred = model.predict(features)[0]               # 1 = Go, 0 = No Go
+    prob = model.predict_proba(features)[0][1]     # probability of Go
 
-    recommendation = "GO" if score < 0.5 else "NO GO"
-
-    return round(score, 2), recommendation
+    recommendation = "GO" if pred == 1 else "NO GO"
+    return float(prob), recommendation
