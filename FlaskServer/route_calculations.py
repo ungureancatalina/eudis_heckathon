@@ -234,6 +234,7 @@ def get_next_safest(lat, lon, bearing, end_lat, end_lon, precision=180, points =
             safest = node
         elif node.risk_score == safest.risk_score and geodesic((node.lat, node.lon), (end_lat, end_lon)).kilometers < geodesic((safest.lat, safest.lon), (end_lat, end_lon)).kilometers:
             safest = node
+
     return safest
 
 
@@ -246,8 +247,8 @@ def shortest_route_opt(start_lat, start_lon, end_lat, end_lon):
     approx_steps = geodesic((path[-1].lat, path[-1].lon), (end_lat, end_lon)).kilometers / ROUTE_RESOLUTION
     current_step = 0
 
-    while geodesic((path[-1].lat, path[-1].lon), (end_lat, end_lon)).kilometers > ROUTE_RESOLUTION * 2:
-        next_node = get_next_safest(path[-1].lat, path[-1].lon, bearing, end_lat, end_lon)
+    while geodesic((path[-1].lat, path[-1].lon), (end_lat, end_lon)).kilometers > ROUTE_RESOLUTION * 1.5:
+        next_node = get_next_safest(path[-1].lat, path[-1].lon, bearing, end_lat, end_lon, 120)
         bearing = bearing_between(next_node.lat, next_node.lon, end_lat, end_lon)
         path.append(next_node)
         print("Progress: " + str(round(current_step/ approx_steps * 100, 1)) + "%")
