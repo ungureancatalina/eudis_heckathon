@@ -16,6 +16,21 @@ AeroMind is a lightweight, integrated mission-planning platform designed to make
 
 ---
 
+## Technologies Used
+
+| Tool                       | Purpose                                             |
+|----------------------------|-----------------------------------------------------|
+| Python (AI Module)         | Risk prediction and environmental hazard analysis   |
+| React                      | Frontend development                                | 
+| Tailwind CSS               | Fast styling with responsive design                 | 
+| Typescript                 | Strong typing for safer code                        |
+| Vite	                     | Fast frontend bundler                               |
+| Leaflet.js	               | Interactive map rendering                           |
+| Sentinel Hub API           | Satellite imagery, NDVI/DEM/terrain data            |
+| Weather API                | Real-time weather, wind, visibility                 |
+
+---
+
 ## Features
 
 - Real-time data integration
@@ -25,7 +40,31 @@ AeroMind is a lightweight, integrated mission-planning platform designed to make
 - Hazard & environment awareness
 - Mission status: Go / No-Go
 
+---
+
+## Project Structure
+```
+defence-dashboard/
+├── src/
+│   ├── components/        # UI components: Coordinate, DroneList etc.
+│   ├── services/          # Api Routes
+│   ├── pages/             # Dashboard UI
+├── public/                # Images & assets
+├── App.(tsx)              # Main application file
+└── main.(tsx)             # Entry point
+
+FlaskServer/
+├── ai/                      # Rick AI Model Prediction
+├── db/                      # Database
+├── utils/                   # SentinelHub, Weaather Api etc.
+├── app.(py)                 # Main application file
+└── route_calculations.(py)  # Route Optimisation and Calculation
+```
+
+---
+
 ## This is how the project looks like:
 
-https://github.com/user-attachments/assets/d96bab00-290b-4706-9644-ce2a248ac016
+https://github.com/user-attachments/assets/6a26c259-fc4f-493b-8dbd-8a190a403077
+
 
